@@ -26,7 +26,7 @@ resource "azurerm_linux_virtual_machine" "NexusVm" {
     resource_group_name   = data.terraform_remote_state.remote.outputs.rgname
     size                  = "Standard_DS1_v2"
    
-    network_interface_ids = [azurerm_network_interface.nic.id]
+    network_interface_ids = [azurerm_network_interface.nic2.id]
     os_disk {
        name              = "myOsDisk"
         caching           = "ReadWrite"
@@ -50,7 +50,7 @@ resource "azurerm_linux_virtual_machine" "NexusVm" {
  
 }
 
-resource "azurerm_network_interface" "nic" {
+resource "azurerm_network_interface" "nic2" {
   name                = "azurerm-nic"
   location            = data.terraform_remote_state.remote.outputs.rglocation
   resource_group_name = data.terraform_remote_state.remote.outputs.rgname
@@ -59,13 +59,13 @@ resource "azurerm_network_interface" "nic" {
     name                          = "internal"
     subnet_id                     = data.terraform_remote_state.remote.outputs.subnetId
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id  = azurerm_public_ip.publicip1.id
+    public_ip_address_id  = azurerm_public_ip.publicip2.id
 
   }
 }
 
 resource "azurerm_public_ip" "publicip1" {
-    name                         = "myPublicIP1"
+    name                         = "myPublicIP2"
     location                     = data.terraform_remote_state.remote.outputs.rglocation
     resource_group_name          = data.terraform_remote_state.remote.outputs.rgname
     allocation_method            = "Dynamic"
@@ -76,7 +76,7 @@ resource "azurerm_public_ip" "publicip1" {
 }
 
 data "azurerm_public_ip" "NexusIp" {
-  name                = azurerm_public_ip.publicip1.name
+  name                = azurerm_public_ip.publicip2.name
   resource_group_name = azurerm_linux_virtual_machine.NexusVm.resource_group_name
 }
 
