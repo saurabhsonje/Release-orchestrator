@@ -4,7 +4,7 @@ provider "azurerm" {
 }
 
 variable "prefixjen" {
-  default = "Gitlab"
+  default = "Nexus"
 }
 
 data "terraform_remote_state" "remote" {
@@ -20,13 +20,13 @@ data "terraform_remote_state" "remote" {
 
 
 # Create virtual machine
-resource "azurerm_linux_virtual_machine" "Gitlab" {
+resource "azurerm_linux_virtual_machine" "GitlabVm" {
     name                  = "${var.prefixjen}-vm"
     location              = data.terraform_remote_state.remote.outputs.rglocation
     resource_group_name   = data.terraform_remote_state.remote.outputs.rgname
     size                  = "Standard_DS1_v2"
    
-    network_interface_ids = [azurerm_network_interface.nic.id]
+    network_interface_ids = [azurerm_network_interface.nic4.id]
     os_disk {
        name              = "myOsDisk"
         caching           = "ReadWrite"
@@ -50,7 +50,7 @@ resource "azurerm_linux_virtual_machine" "Gitlab" {
  
 }
 
-resource "azurerm_network_interface" "nic" {
+resource "azurerm_network_interface" "nic4" {
   name                = "azurerm-nic"
   location            = data.terraform_remote_state.remote.outputs.rglocation
   resource_group_name = data.terraform_remote_state.remote.outputs.rgname
@@ -59,13 +59,13 @@ resource "azurerm_network_interface" "nic" {
     name                          = "internal"
     subnet_id                     = data.terraform_remote_state.remote.outputs.subnetId
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id  = azurerm_public_ip.publicip1.id
+    public_ip_address_id  = azurerm_public_ip.publicip4.id
 
   }
 }
 
 resource "azurerm_public_ip" "publicip1" {
-    name                         = "myPublicIP1"
+    name                         = "myPublicIP4"
     location                     = data.terraform_remote_state.remote.outputs.rglocation
     resource_group_name          = data.terraform_remote_state.remote.outputs.rgname
     allocation_method            = "Dynamic"
@@ -75,12 +75,12 @@ resource "azurerm_public_ip" "publicip1" {
     }
 }
 
-data "azurerm_public_ip" "GitlabIp" {
-  name                = azurerm_public_ip.publicip1.name
-  resource_group_name = azurerm_linux_virtual_machine.GitlabVm.resource_group_name
+data "azurerm_public_ip" "NexusIp" {
+  name                = azurerm_public_ip.publicip4.name
+  resource_group_name = azurerm_linux_virtual_machine.NexusVm.resource_group_name
 }
 
-output "GitlabIp"{
+output "NexusIp"{
 
-	value = data.azurerm_public_ip.GitlabIp.ip_address
+	value = data.azurerm_public_ip.NexusIp.ip_address
 }
