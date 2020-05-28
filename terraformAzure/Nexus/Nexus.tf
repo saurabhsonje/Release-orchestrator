@@ -1,7 +1,20 @@
+provider "azurerm" {
+	version = "=2.0.0"
+	features {}
+}
 variable "prefixjen" {
   default = "Nexus"
 }
+data "terraform_remote_state" "remote" {
+  backend = "azurerm"
+  config = {
+    resource_group_name  = "DAL"
+    storage_account_name = "azurermstorage"
+    container_name       = "azurermcontainer"
+    key                  = "terraform.tfstate"
+  }
 
+}
 # Create virtual machine
 resource "azurerm_linux_virtual_machine" "NexusVm" {
     name                  = "${var.prefixjen}-vm"
